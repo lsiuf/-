@@ -45,6 +45,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+<script src="./school.js"></script>
 
 <script>
     var that = new Vue({
@@ -63,7 +64,6 @@
         methods: {
             rowClassName(row, rowIndex) {
                 let jblxdm = this.jblxdmKey[row.row.jblxdm];
-                console.log(row)
                 if (jblxdm === 1) {
                     return 'warning-row';
                 }
@@ -74,28 +74,40 @@
                     return 'primary-row';
                 }
                 return '';
+            },
+            getScListByHttp() {
+                that.loading = true;
+                $.get("https://www.eeagd.edu.cn/ptzsbks/public/jbxx/getYxxxBm.jsmeb", (data, status) => {
+                    let result = data.result.result;
+                    result.sort((a, b) => {
+                        return that.jblxdmKey[b.jblxdm] - that.jblxdmKey[a.jblxdm];
+                    });
+                    result.forEach(r => {
+                        let p = "['" + r.yxdm + "']";
+                        $.post("https://www.eeagd.edu.cn/ptzsbks/public/jbxx/getZyjhByYxdmBm.jsmeb", p, (data2, status) => {
+                            r.major = data2.result.result;
+                        });
+                    });
+                    that.sclist = result;
+                    that.loading = false;
+                });
+            },
+            getScListByJSON() {
+                that.loading = true;
+                that.sclist = scListJson;
+                that.sclist.forEach(data =>{
+                    data.major = JSON.parse(data.major);
+                });
+                that.loading = false;
             }
         }
     })
 </script>
 
 <script>
-    that.loading = true;
-    $.get("https://www.eeagd.edu.cn/ptzsbks/public/jbxx/getYxxxBm.jsmeb", function (data, status) {
-        let result = data.result.result;
-        result.sort((a, b) => {
-            return that.jblxdmKey[b.jblxdm] - that.jblxdmKey[a.jblxdm];
-        });
-        result.forEach(r => {
-            let p = "['" + r.yxdm + "']";
-            $.post("https://www.eeagd.edu.cn/ptzsbks/public/jbxx/getZyjhByYxdmBm.jsmeb", p, function (data2, status) {
-                r.major = data2.result.result;
-            });
-        });
-        that.sclist = result;
-        that.loading = false;
-    });
+    that.getScListByJSON();
 </script>
+
 
 <style>
     .el-table .primary-row {
