@@ -1,2 +1,2 @@
 # 广东专插本院校信息，接口来自广东考试院
-注：需要解决跨域问题，可以使用谷歌浏览器跨域插件
+[在线查看地址](https://lsiuf.github.io/Guangdong-undergraduate-transfer-students/school.html)
